@@ -26,7 +26,7 @@ vim.opt.scrolloff = 10
 
 vim.keymap.set({ "n", "x" }, "y", '"+y')
 vim.keymap.set("n", "<leader>\\", ":Alpha<CR>")
-vim.keymap.set("n", "<leader>pv", ":Ex <CR>")
+vim.keymap.set("n", "<leader>v", ":Ex <CR>")
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
 
 vim.api.nvim_create_autocmd("CursorHold", {
@@ -88,6 +88,36 @@ require("lazy").setup({
             "mason-org/mason.nvim",
             opts = {}
     },
+
+    {
+            "hrsh7th/nvim-cmp",
+            dependencies = { "hrsh7th/cmp-nvim-lsp" },
+            config = function()
+                local cmp = require("cmp")
+                cmp.setup({
+                    mapping = {
+                        ["<C-n>"] = cmp.mapping.select_next_item(),
+                        ["<C-p>"] = cmp.mapping.select_prev_item(),
+                        ["<Tab>"] = cmp.mapping(function(fallback)
+                            if cmp.visible() then
+                                cmp.select_next_item()
+                            else
+                                fallback()
+                            end
+                        end, { "i", "s" }),
+                        ["<CR>"] = cmp.mapping.confirm({ select = true }),
+                    },
+                    sources = {
+                        { name = "nvim_lsp" },
+                    },
+                    experimental = {
+                        ghost_text = true,
+                    },
+
+                })
+            end,
+    },
+
 
     {
             'nvim-telescope/telescope.nvim', tag = '0.1.8',
