@@ -72,6 +72,7 @@ require("lazy").setup({
 				handlers = {
 					function(server)
 						vim.lsp.config[server].setup({
+							capabilities = capabilities,
 							on_attach = function(_, bufnr)
 								local map = function(mode, lhs, rhs)
 									vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, silent = true })
@@ -97,6 +98,7 @@ require("lazy").setup({
 		dependencies = { "hrsh7th/cmp-nvim-lsp" },
 		config = function()
 			local cmp = require("cmp")
+			local capabilities = require("cmp_nvim_lsp").default_capabilities()
 			cmp.setup({
 				mapping = {
 					["<C-n>"] = cmp.mapping.select_next_item(),
@@ -113,9 +115,9 @@ require("lazy").setup({
 				sources = {
 					{ name = "nvim_lsp" },
 				},
-				--experimental = {
-				--ghost_text = true,
-				--},
+				experimental = {
+					ghost_text = true,
+				},
 			})
 		end,
 	},
