@@ -28,6 +28,9 @@ vim.keymap.set({ "n", "x" }, "y", '"+y')
 vim.keymap.set("n", "<leader>\\", ":Alpha<CR>")
 vim.keymap.set("n", "<leader>v", ":Ex <CR>")
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
+vim.keymap.set("x", "K", ":move '<-2<CR>gv", { silent = true })
+vim.keymap.set("x", "J", ":move '>+1<CR>gv", { silent = true })
+
 
 vim.api.nvim_create_autocmd("CursorHold", {
 	callback = function()
