@@ -1,4 +1,4 @@
--- new nvim conf
+-- main nvim conf
 print("welcome back <3")
 
 local vim = vim
@@ -198,6 +198,21 @@ require("lazy").setup({
 	{
 		"sphamba/smear-cursor.nvim",
 		opts = {},
+	},
+
+	{
+		"nvim-lualine/lualine.nvim",
+		dependencies = { "nvim-tree/nvim-web-devicons" },
+		opts = {
+			component_separators = { left = "", right = "" },
+			section_separators = { left = "", right = "" },
+
+			sections = {
+				lualine_c = {
+					{ "filename", path = 1 },
+				},
+			},
+		},
 	},
 })
 
