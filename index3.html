@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Flip Clock</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: #111;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Bebas Neue', cursive;
+    }
+
+    .clock {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .card-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .unit {
+      margin-top: 10px;
+      font-size: 9px;
+      letter-spacing: 4px;
+      color: #444;
+    }
+
+    /* ── Colon ── */
+    .colon {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      /* visually center between the card halves */
+      margin-bottom: 22px;
+    }
+    .colon span {
+      width: 6px; height: 6px;
+      background: #333;
+      border-radius: 50%;
+    }
+
+    /* ─────────────────────────────────────────
+       FLIP CARD
+       Each card has 4 pieces:
+         .upper   — static top half, shows CURRENT value
+         .lower   — static bottom half, shows CURRENT value
+         .flip-top   — animated flap (top half rotating away, shows CURRENT)
+         .flip-bottom — animated flap (bottom half rotating in, shows NEXT)
+    ───────────────────────────────────────── */
+
+    .flip {
+      position: relative;
+      width: 100px;
+      height: 120px;   /* 2 × 60px */
+      perspective: 500px;
+    }
+
+    /* Shared: the number must be rendered at full card height (120px)
+       and then clipped to 60px. Both halves render identically sized text;
+       overflow:hidden does the clipping. */
+
+    .upper, .lower, .flip-top, .flip-bottom {
+      position: absolute;
+      left: 0; right: 0;
+      height: 60px;
+      overflow: hidden;
+    }
+
+    /* The span is always 120px tall and sits at top:0 of each half.
+       Upper half (top:0): span top=0 → we see the top 60px of the digit.
+       Lower half (bottom:0 = top:60px of card): span top:-60px → we see the bottom 60px. */
+    .upper span, .lower span,
+    .flip-top span, .flip-bottom span {
+      font-size: 110px;
+      line-height: 120px;
+      color: #e0e0e0;
+      display: block;
+      width: 100%;
+      text-align: center;
+      height: 120px;
+      position: absolute;
+      left: 0; right: 0;
+    }
+
+    .upper, .flip-top {
+      top: 0;
+      background: #252525;
+      border-radius: 8px 8px 0 0;
+    }
+
+    /* span anchored to top of the card (top:0 relative to .upper which is at card top) */
+    .upper span, .flip-top span {
+      top: 0;
+    }
+
+    .lower, .flip-bottom {
+      bottom: 0;
+      background: #1c1c1c;
+      border-radius: 0 0 8px 8px;
+    }
+
+    /* span must show the bottom half of the digit.
+       .lower sits at card top+60px, so shift span up by 60px to align with card top. */
+    .lower span, .flip-bottom span {
+      top: -60px;
+      color: #c8c8c8;
+    }
+
+    /* ── Animated flaps sit on top ── */
+    .flip-top {
+      transform-origin: bottom center;
+      z-index: 3;
+      backface-visibility: hidden;
+    }
+
+    .flip-bottom {
+      transform-origin: top center;
+      z-index: 2;
+      transform: rotateX(90deg);   /* starts folded down, hidden */
+      backface-visibility: hidden;
+    }
+
+    /* ── Keyframes ── */
+    /* Top flap: 0° → -90° (folds away downward, disappears at edge-on) */
+    @keyframes fold-away {
+      0%   { transform: rotateX(0deg); }
+      100% { transform: rotateX(-90deg); }
+    }
+
+    /* Bottom flap: 90° → 0° (unfolds from edge-on to flat) */
+    @keyframes unfold-in {
+      0%   { transform: rotateX(90deg); }
+      100% { transform: rotateX(0deg); }
+    }
+
+    .flip-top.go    { animation: fold-away  0.22s ease-in  forwards; }
+    .flip-bottom.go { animation: unfold-in  0.22s ease-out forwards;
+                      animation-delay: 0.22s; }
+
+    /* ── Toggle ── */
+    .toggle {
+      position: fixed;
+      top: 20px;
+      right: 24px;
+      display: flex;
+      gap: 0;
+      border: 1px solid #2a2a2a;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .toggle button {
+      background: #1a1a1a;
+      border: none;
+      color: #444;
+      font-family: 'Bebas Neue', cursive;
+      font-size: 13px;
+      letter-spacing: 2px;
+      padding: 6px 14px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .toggle button:first-child {
+      border-right: 1px solid #2a2a2a;
+    }
+
+    .toggle button.active {
+      background: #2a2a2a;
+      color: #ccc;
+    }
+
+    /* ── Center groove */
+    .flip::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0;
+      top: 59px;
+      height: 2px;
+      background: #0d0d0d;
+      z-index: 10;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="toggle">
+  <button id="btn-24" class="active" onclick="setFmt(24)">24H</button>
+  <button id="btn-12" onclick="setFmt(12)">12H</button>
+</div>
+
+<div class="clock">
+  <div class="card-wrap">
+    <div class="flip" id="flip-h">
+      <div class="upper">  <span id="h-upper">00</span></div>
+      <div class="lower">  <span id="h-lower">00</span></div>
+      <div class="flip-top"><span id="h-ft">00</span></div>
+      <div class="flip-bottom"><span id="h-fb">00</span></div>
+    </div>
+    <div class="unit">Hours</div>
+  </div>
+
+  <div class="colon"><span></span><span></span></div>
+
+  <div class="card-wrap">
+    <div class="flip" id="flip-m">
+      <div class="upper">  <span id="m-upper">00</span></div>
+      <div class="lower">  <span id="m-lower">00</span></div>
+      <div class="flip-top"><span id="m-ft">00</span></div>
+      <div class="flip-bottom"><span id="m-fb">00</span></div>
+    </div>
+    <div class="unit">Min</div>
+  </div>
+
+  <div class="colon"><span></span><span></span></div>
+
+  <div class="card-wrap">
+    <div class="flip" id="flip-s">
+      <div class="upper">  <span id="s-upper">00</span></div>
+      <div class="lower">  <span id="s-lower">00</span></div>
+      <div class="flip-top"><span id="s-ft">00</span></div>
+      <div class="flip-bottom"><span id="s-fb">00</span></div>
+    </div>
+    <div class="unit">Sec</div>
+  </div>
+</div>
+
+<script>
+  const pad = n => String(n).padStart(2, '0');
+  let cur = { h: null, m: null, s: null };
+  let fmt = 24;
+
+  function setFmt(f) {
+    fmt = f;
+    document.getElementById('btn-24').classList.toggle('active', f === 24);
+    document.getElementById('btn-12').classList.toggle('active', f === 12);
+    // Force immediate redraw without animation
+    cur = { h: null, m: null, s: null };
+    tick();
+  }
+
+  function flipCard(id, nextVal) {
+    const upper = document.getElementById(`${id}-upper`);
+    const lower = document.getElementById(`${id}-lower`);
+    const ft    = document.getElementById(`${id}-ft`);
+    const fb    = document.getElementById(`${id}-fb`);
+    const ftEl  = ft.parentElement;
+    const fbEl  = fb.parentElement;
+
+    const curVal = upper.textContent;
+
+    // Top flap shows current value and folds away
+    ft.textContent = curVal;
+    // Bottom flap shows next value and unfolds in
+    fb.textContent = nextVal;
+
+    // Remove then re-add class to restart animation
+    ftEl.classList.remove('go');
+    fbEl.classList.remove('go');
+
+    // Reset bottom flap to hidden position instantly
+    fbEl.style.animation = 'none';
+    fbEl.style.transform = 'rotateX(90deg)';
+
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      fbEl.style.animation = '';
+      ftEl.classList.add('go');
+      fbEl.classList.add('go');
+    }));
+
+    // At midpoint (top flap fully gone), update the static upper to next
+    setTimeout(() => {
+      upper.textContent = nextVal;
+    }, 220);
+
+    // After full animation, update static lower and reset flaps
+    setTimeout(() => {
+      lower.textContent = nextVal;
+      ftEl.classList.remove('go');
+      fbEl.classList.remove('go');
+      ft.textContent = nextVal;
+      fbEl.style.transform = 'rotateX(90deg)';
+    }, 460);
+  }
+
+  function tick() {
+    const now = new Date();
+    let rawH  = now.getHours();
+    if (fmt === 12) rawH = rawH % 12 || 12;
+    const h = pad(rawH);
+    const m = pad(now.getMinutes());
+    const s = pad(now.getSeconds());
+
+    if (cur.h === null) {
+      ['h','m','s'].forEach(id => {
+        const v = id === 'h' ? h : id === 'm' ? m : s;
+        document.getElementById(`${id}-upper`).textContent = v;
+        document.getElementById(`${id}-lower`).textContent = v;
+        document.getElementById(`${id}-ft`).textContent    = v;
+        document.getElementById(`${id}-fb`).textContent    = v;
+      });
+      cur = { h, m, s };
+      return;
+    }
+
+    if (s !== cur.s) { flipCard('s', s); cur.s = s; }
+    if (m !== cur.m) { flipCard('m', m); cur.m = m; }
+    if (h !== cur.h) { flipCard('h', h); cur.h = h; }
+  }
+
+  tick();
+  setInterval(tick, 1000);
+</script>
+</body>
+</html>
