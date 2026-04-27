@@ -31,6 +31,10 @@ if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi
 
+echo "Remember who you're doing this for 🐝"
+
+#PS1="\[\033[38;5;15m\]\w 🐝 \[\033[0m\]"
 PS1="\[\033[38;5;15m\]\w $ \[\033[0m\]"
+
 unset rc
 

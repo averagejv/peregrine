@@ -101,11 +101,6 @@ require("lazy").setup({
     },
 
     {
-        "mason-org/mason.nvim",
-        opts = {},
-    },
-
-    {
         "hrsh7th/nvim-cmp",
         dependencies = { "hrsh7th/cmp-nvim-lsp" },
         config = function()
@@ -128,7 +123,7 @@ require("lazy").setup({
                     { name = "nvim_lsp" },
                 },
                 experimental = {
-                    ghost_text = true,
+                    --ghost_text = true,
                 },
             })
         end,
@@ -150,10 +145,11 @@ require("lazy").setup({
                 local alpha = require("alpha")
                 local dashboard = require("alpha.themes.dashboard")
                 dashboard.section.buttons.val = {
-                    dashboard.button("t", "  > tree", ":Ex <CR>"),
-                    dashboard.button("f", "  > append", ":Telescope find_files <CR>"),
-                    dashboard.button("r", "  > grep", ":Telescope oldfiles <CR>"),
-                    dashboard.button("q", "  > bye", ":qa<CR>"),
+                    dashboard.button("b", "   > buffer", ":ene <BAR> startinsert <CR>"),
+                    dashboard.button("t", "   > tree", ":Ex <CR>"),
+                    dashboard.button("r", "   > recent", ":Telescope oldfiles <CR>"),
+                    dashboard.button("g", "   > grep", ":Telescope live_grep <CR>"),
+                    dashboard.button("q", "   > bye", ":qa<CR>"),
                 }
 
                 dashboard.section.footer.val = {
@@ -169,8 +165,37 @@ require("lazy").setup({
         lazy = false,
         priority = 1000,
         config = function()
-            vim.cmd("colorscheme kanagawa-dragon")
+            --vim.cmd("colorscheme kanagawa-wave")
         end,
+    },
+
+    {
+        "catppuccin/nvim",
+        name = "catppuccin",
+        priority = 1000,
+        config = function()
+            --vim.cmd("colorscheme catppuccin-latte")
+        end,
+    },
+
+    {
+        "EdenEast/nightfox.nvim",
+        lazy = false,
+        priority = 1000,
+        config = function()
+            vim.cmd("colorscheme nordfox")
+        end
+    },
+
+    {
+        "rose-pine/neovim",
+        name = "rose-pine",
+        config = function()
+            require('rose-pine').setup({
+                variant = 'moon',
+            })
+            --vim.cmd("colorscheme rose-pine")
+        end
     },
 
     {
@@ -186,7 +211,6 @@ require("lazy").setup({
             end
         end,
     },
-
     {
         "nvim-treesitter/nvim-treesitter",
         branch = "master",
@@ -200,11 +224,6 @@ require("lazy").setup({
                 },
             })
         end,
-    },
-
-    {
-        "vyfor/cord.nvim",
-        build = ":Cord update",
     },
 
     {
@@ -233,7 +252,16 @@ require("lazy").setup({
         ---@module 'render-markdown'
         ---@type render.md.UserConfig
     },
+
+    {
+        "goerz/jupytext.vim",
+    }
+
 })
+
+vim.api.nvim_create_user_command('Config', function()
+    vim.cmd('edit ' .. vim.fn.stdpath('config') .. '/init.lua')
+end, {})
 
 vim.o.completeopt = "menu,menuone,noselect"
 vim.opt.complete = ""

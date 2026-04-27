@@ -1,0 +1,45 @@
+# Run `ghostty +show-config --default --docs` to view a list of config options
+
+# Config syntax crash course
+# ==========================
+# # The config file consists of simple key-value pairs,
+# # separated by equals signs.
+
+
+# config
+# theme = Rose Pine Moon
+theme = Nord
+
+# Iosveka 
+#font-family = Iosevka
+
+# Iosveka slab
+#font-family = Iosevka Slab
+
+#Google Sans
+#font-family = Google Sans Code
+
+#Google Sans Light
+font-family = Google Sans Code Light
+
+
+font-size = 14
+
+# Place tabs at the bottom
+# gtk-tabs-location = bottom
+
+# Switch to tab 1–9 with Ctrl+number
+keybind = ctrl+1=goto_tab:1
+keybind = ctrl+2=goto_tab:2
+keybind = ctrl+3=goto_tab:3
+keybind = ctrl+4=goto_tab:4
+keybind = ctrl+5=goto_tab:5
+keybind = ctrl+6=goto_tab:6
+keybind = ctrl+7=goto_tab:7
+keybind = ctrl+8=goto_tab:8
+keybind = ctrl+9=goto_tab:9
+
+cursor-style = block
+
+maximize = true
+gtk-titlebar-hide-when-maximized = true
