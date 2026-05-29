@@ -7,5 +7,4 @@
 |_|                  |___/
 ```
 my laptop
-
-nordic colorscheme
+its very pink
