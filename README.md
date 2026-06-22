@@ -6,5 +6,4 @@
 | .__/ \___|_|  \___|\__, |_|  |_|_| |_|\___(_)
 |_|                  |___/
 ```
-my laptop
-the best laptop to ever do it
+my puter
