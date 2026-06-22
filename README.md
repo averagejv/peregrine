@@ -7,4 +7,4 @@
 |_|                  |___/
 ```
 my laptop
-its very pink
+the best laptop to ever do it
